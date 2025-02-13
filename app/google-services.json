@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "811135319259",
+    "project_id": "roomv1-cba25",
+    "storage_bucket": "roomv1-cba25.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811135319259:android:f6639fb49c502d663820fe",
+        "android_client_info": {
+          "package_name": "com.example.roomv1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_CPYCHE_CIywlgObzjmYSlXsGlfkl9HY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
