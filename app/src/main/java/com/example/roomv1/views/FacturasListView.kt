@@ -1,13 +1,16 @@
 package com.example.roomv1.views
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -17,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,17 +45,17 @@ fun FacturasListView(navController: NavController, viewModel: FacturasViewModel,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(text = "Pantalla de Inicio", color = Color.Black, fontWeight = FontWeight.Bold)
+                    Text(text = "Pantalla de Inicio", color = Color.White, fontWeight = FontWeight.Bold)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Red
+                    containerColor = Color.Blue
                 )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navController.navigate(route= "FacturasAddView") },
-                containerColor = Color.Red,
+                containerColor = Color.Blue,
                 contentColor = Color.White
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar")
@@ -66,6 +70,7 @@ fun FacturasListView(navController: NavController, viewModel: FacturasViewModel,
 }
 
 @Composable
+
 fun ContentView(it: PaddingValues, navController: NavController, viewModel: FacturasViewModel,  numeroFactura: String, fechaEmision: String, empresa: String, nif: String, direccion: String, baseImponible: Double, iva: Double, total: Double) {
     val state = viewModel.state
     var numeroFactura by remember { mutableStateOf(numeroFactura) }
@@ -73,21 +78,20 @@ fun ContentView(it: PaddingValues, navController: NavController, viewModel: Fact
     var empresa by remember { mutableStateOf(empresa) }
     var nif by remember { mutableStateOf(nif) }
     var direccion by remember { mutableStateOf(direccion) }
-    /*var baseImponible by remember { mutableStateOf(0.0) } // Hacer iva mutable
-    var baseImponibleText by remember { mutableStateOf(baseImponible.toString()) }
-    var iva by remember { mutableStateOf(0.0) } // Hacer iva mutable
-    var ivaText by remember { mutableStateOf(iva.toString()) }
-    var total by remember { mutableStateOf(0.0) }
-    var totalText by remember { mutableStateOf(total.toString()) }*/
-
     var baseImponible by remember { mutableStateOf(baseImponible) } // Asigna el valor pasado al composable
     var iva by remember { mutableStateOf(iva) }
     var total by remember { mutableStateOf(total) }
 
     Column(
-        modifier = Modifier.padding(it)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(it)
     ) {
-        LazyColumn {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize() // Permite que la lista ocupe todo el espacio disponible
+                .weight(1f)
+        ) {
             items(state.facturasList) {
                 Box(
                     modifier = Modifier
@@ -96,16 +100,24 @@ fun ContentView(it: PaddingValues, navController: NavController, viewModel: Fact
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(12.dp)
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .border(2.dp, Color.Gray, shape = RoundedCornerShape(8.dp))
+                            .padding(16.dp) // Espaciado interno dentro del borde
                     ) {
-                        Text(text = it.numeroFactura)
-                        Text(text = it.fechaEmision)
-                        Text(text = it.empresa)
-                        Text(text = it.nif)
-                        Text(text = it.direccion)
-                        Text(text = it.baseImponible.toString())
-                        Text(text = it.iva.toString())
-                        Text(text = it.total.toString())
+
+                        Text(text = "Número de Factura: ${it.numeroFactura}")
+                        Text(text = "Fecha de Emisión: ${it.fechaEmision}")
+                        Text(text = "Empresa: ${it.empresa}")
+                        Text(text = "NIF: ${it.nif}")
+                        Text(text = "Dirección: ${it.direccion}")
+                        Text(text = "Base Imponible: ${"%.2f".format(it.baseImponible)}")
+                        Text(text = "IVA: ${"%.2f".format(it.iva)}%")
+                        Text(
+                            text = "Total: ${"%.2f".format(it.total)}€",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Blue
+                        )
                         Row() {
                             IconButton(
                                 onClick = {

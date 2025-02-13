@@ -1,10 +1,12 @@
 package com.example.roomv1.views
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -13,6 +15,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,7 +46,7 @@ fun FacturasAddView(navController: NavController, viewModel: FacturasViewModel, 
                     Text(text = "Agregar Factura", color = Color.White, fontWeight = FontWeight.Bold)
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Red
+                    containerColor = Color.Blue
                 ),
                 navigationIcon = {
                     IconButton(
@@ -77,8 +80,9 @@ fun ContentAddView(it: PaddingValues, navController: NavController, viewModel: F
 
     var baseImponible by remember { mutableStateOf(baseImponible) }
     var iva by remember { mutableStateOf(iva) }
-    var total by remember { mutableStateOf(total) }
+    //var total by remember { mutableStateOf(total) }
 
+    var total = baseImponible + (baseImponible*iva/100);
 
     Column(
         modifier = Modifier
@@ -179,20 +183,15 @@ fun ContentAddView(it: PaddingValues, navController: NavController, viewModel: F
                 .padding(bottom = 15.dp)
         )
 
-        OutlinedTextField(
-            value = totalText,
-            onValueChange = {
-                totalText = it
-                total = it.toDoubleOrNull() ?: 0.0 // Convierte a Double o usa 0.0 si el input es inválido
-                println("Total: $total") // Depuración
-            },
-            label = { Text(text = "TOTAL") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // Muestra teclado numérico
+        Text(
+            text = "Total = ${"%.2f".format(total)}",
+            style = MaterialTheme.typography.titleLarge,  // Para Material 3
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp)
-                .padding(bottom = 15.dp)
+                .padding(16.dp)
+                .border(2.dp, Color.Black, shape = RoundedCornerShape(8.dp))
+                .padding(8.dp)
         )
+
 
         Button(
             onClick = {
