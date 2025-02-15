@@ -44,7 +44,7 @@ import com.example.roomv1.viewmodels.FacturasViewModel
 @Composable
 fun FacturasListView(navController: NavController, viewModel: FacturasViewModel) {
     // 🔹 Observamos los cambios en la lista de facturas
-    val facturas by remember { derivedStateOf { viewModel.state.facturasList } }
+    val facturas = viewModel.state.facturasList // Accede directamente al estado
 
     Scaffold(
         topBar = {

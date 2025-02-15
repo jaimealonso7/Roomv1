@@ -45,11 +45,11 @@ fun AppNavigation(viewModel: FacturasViewModel) {
 
         composable(
             "FacturasUpdateView/{id}",
-            arguments = listOf(navArgument("id") { type = NavType.IntType })
+            arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            val id = backStackEntry.arguments?.getString("id") ?: ""
             println("ID recibido en NavHost: $id") // 🔹 Verifica el ID en NavHost
-            if (id != -1) {
+            if (id.isNotEmpty()) {
                 FacturasUpdateView(navController, viewModel, id)
             } else {
                 Text("Factura no encontrada")

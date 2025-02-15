@@ -24,7 +24,7 @@ import com.example.roomv1.models.Facturas
 import com.example.roomv1.viewmodels.FacturasViewModel
 
 @Composable
-fun FacturasUpdateView(navController: NavController, viewModel: FacturasViewModel, id: Int) {
+fun FacturasUpdateView(navController: NavController, viewModel: FacturasViewModel, id: String) {
     println("ID recibido: $id") // Verifica el ID recibido
 
     val factura = viewModel.obtenerFacturaPorId(id)
