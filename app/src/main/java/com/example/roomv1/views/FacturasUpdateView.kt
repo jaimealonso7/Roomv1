@@ -1,7 +1,12 @@
 package com.example.roomv1.views
 
+import android.util.Log
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -11,199 +16,154 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.roomv1.models.Facturas
 import com.example.roomv1.viewmodels.FacturasViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturasUpdateView(
-    navController: NavController,
-    viewModel: FacturasViewModel,
-    id: Int,  // Agregamos el ID para poder actualizar correctamente
-    numeroFactura: String,
-    fechaEmision: String,
-    empresa: String,
-    nif: String,
-    direccion: String,
-    baseImponible: Double,
-    iva: Double,
-    total: Double
-) {
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(text = "Actualizar Factura", color = Color.White, fontWeight = FontWeight.Bold)
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Red),
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Regresar", tint = Color.White)
-                    }
-                }
-            )
-        }
-    ) {
-        ContentUpdateView(it, navController, viewModel, id, numeroFactura, fechaEmision, empresa, nif, direccion, baseImponible, iva, total)
+fun FacturasUpdateView(navController: NavController, viewModel: FacturasViewModel, id: Int) {
+    println("ID recibido: $id") // Verifica el ID recibido
+
+    val factura = viewModel.obtenerFacturaPorId(id)
+
+    if (factura == null) {
+        Log.e("FacturasApp", "Factura con ID $id no encontrada")
+        Text("Factura no encontrada")
+        return
     }
-}
 
-@Composable
-fun ContentUpdateView(
-    it: PaddingValues,
-    navController: NavController,
-    viewModel: FacturasViewModel,
-    id: Int,
-    numeroFactura: String,
-    fechaEmision: String,
-    empresa: String,
-    nif: String,
-    direccion: String,
-    baseImponible: Double,
-    iva: Double,
-    total: Double
-) {
-    var numeroFactura by remember { mutableStateOf(numeroFactura) }
-    var fechaEmision by remember { mutableStateOf(fechaEmision) }
-    var empresa by remember { mutableStateOf(empresa) }
-    var nif by remember { mutableStateOf(nif) }
-    var direccion by remember { mutableStateOf(direccion) }
-    var baseImponible by remember { mutableStateOf(baseImponible) }
-    var iva by remember { mutableStateOf(iva) }
-    var total by remember { mutableStateOf(total) }
-
-    var baseImponibleText by remember { mutableStateOf(baseImponible.toString()) }
-    var ivaText by remember { mutableStateOf(iva.toString()) }
-    var totalText by remember { mutableStateOf(total.toString()) }
-
-    var errorMessage by remember { mutableStateOf("") } // Mensaje de error para validaciones
+    var baseImponible by remember { mutableStateOf(factura.baseImponible) }
+    var iva by remember { mutableStateOf(factura.iva) }
+    val total = baseImponible + (baseImponible * iva / 100)
 
     Column(
         modifier = Modifier
-            .padding(it)
-            .padding(top = 30.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()) // Permite desplazarse si el contenido es largo
     ) {
-        OutlinedTextField(
-            value = numeroFactura,
-            onValueChange = { numeroFactura = it },
-            label = { Text(text = "Número Factura") },
+        // Título centralizado con un tamaño adecuado y color
+        Text(
+            text = "Editar Factura ID: $id",
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = MaterialTheme.colorScheme.primary
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
+                .padding(bottom = 24.dp),
+            textAlign = TextAlign.Center
         )
 
+        // Campo para Base Imponible
         OutlinedTextField(
-            value = fechaEmision,
-            onValueChange = { fechaEmision = it },
-            label = { Text(text = "Fecha Emisión") },
+            value = baseImponible.toString(),
+            onValueChange = { baseImponible = it.toDoubleOrNull() ?: 0.0 },
+            label = { Text("Base Imponible") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
+                .padding(bottom = 16.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp)),
+            singleLine = true
         )
 
+        // Campo para IVA
         OutlinedTextField(
-            value = empresa,
-            onValueChange = { empresa = it },
-            label = { Text(text = "Empresa") },
+            value = iva.toString(),
+            onValueChange = { iva = it.toDoubleOrNull() ?: 0.0 },
+            label = { Text("IVA") },
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
+                .padding(bottom = 24.dp)
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp)),
+            singleLine = true
         )
 
-        OutlinedTextField(
-            value = nif,
-            onValueChange = { nif = it },
-            label = { Text(text = "NIF") },
+        // Total calculado
+        Text(
+            text = "Total: ${"%.2f".format(total)}€",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = MaterialTheme.colorScheme.secondary
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
+                .padding(bottom = 32.dp),
+            textAlign = TextAlign.Center
         )
 
-        OutlinedTextField(
-            value = direccion,
-            onValueChange = { direccion = it },
-            label = { Text(text = "Dirección") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = baseImponibleText,
-            onValueChange = {
-                baseImponibleText = it
-                baseImponible = it.toDoubleOrNull() ?: 0.0
-            },
-            label = { Text(text = "Base Imponible") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = ivaText,
-            onValueChange = {
-                ivaText = it
-                iva = it.toDoubleOrNull() ?: 0.0
-            },
-            label = { Text(text = "IVA") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = totalText,
-            onValueChange = {
-                totalText = it
-                total = it.toDoubleOrNull() ?: 0.0
-            },
-            label = { Text(text = "Total") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 8.dp)
-        )
-
-        // Muestra un mensaje de error si los valores son incorrectos
-        if (errorMessage.isNotEmpty()) {
-            Text(text = errorMessage, color = Color.Red, modifier = Modifier.padding(8.dp))
-        }
-
+        // Botón "Guardar Cambios" con estilo y color
         Button(
             onClick = {
-                // Validaciones antes de actualizar
-                if (numeroFactura.isEmpty() || empresa.isEmpty() || nif.isEmpty() || direccion.isEmpty() || fechaEmision.isEmpty()) {
-                    errorMessage = "Todos los campos deben estar llenos."
-                } else if (baseImponible <= 0 || iva < 0 || total <= 0) {
-                    errorMessage = "Los valores numéricos deben ser mayores que 0."
-                } else {
-                    errorMessage = "" // Limpia el mensaje de error
-                    val facturaActualizada = Facturas(
-                        id = id,
-                        numeroFactura = numeroFactura,
-                        fechaEmision = fechaEmision,
-                        empresa = empresa,
-                        nif = nif,
-                        direccion = direccion,
-                        baseImponible = baseImponible,
-                        iva = iva,
-                        total = total
-                    )
-
-                    viewModel.actualizarFactura(facturaActualizada) // Llamamos a la actualización
-                    navController.popBackStack() // Volvemos atrás
-                }
+                val updatedFactura = factura.copy(baseImponible = baseImponible, iva = iva, total = total)
+                viewModel.actualizarFactura(updatedFactura)
+                navController.popBackStack() // Regresa a la lista
             },
-            modifier = Modifier.padding(top = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Text(text = "Guardar Cambios")
+            Text(
+                text = "Guardar Cambios",
+                color = Color.White,
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+            )
         }
     }
 }
+
+
+/*@Composable
+fun FacturasUpdateView(navController: NavController, viewModel: FacturasViewModel, id: Int) {
+    println("ID recibido: $id") // 🔹 Verifica el ID recibido
+
+    val factura = viewModel.obtenerFacturaPorId(id)
+
+    if (factura == null) {
+        Log.e("FacturasApp", "⚠️ Factura con ID $id no encontrada")
+        Text("Factura no encontrada")
+        return
+    }
+
+    var baseImponible by remember { mutableStateOf(factura.baseImponible) }
+    var iva by remember { mutableStateOf(factura.iva) }
+    val total = baseImponible + (baseImponible * iva / 100)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Text(text = "Editar Factura ID: $id") // Mostrar en pantalla
+
+        TextField(
+            value = baseImponible.toString(),
+            onValueChange = { baseImponible = it.toDoubleOrNull() ?: 0.0 },
+            label = { Text("Base Imponible") }
+        )
+        TextField(
+            value = iva.toString(),
+            onValueChange = { iva = it.toDoubleOrNull() ?: 0.0 },
+            label = { Text("IVA") }
+        )
+
+        Text(text = "Total: ${"%.2f".format(total)}€")
+
+        Button(onClick = {
+            val updatedFactura = factura.copy(baseImponible = baseImponible, iva = iva, total = total)
+            viewModel.actualizarFactura(updatedFactura)
+            navController.popBackStack()
+        }) {
+            Text("Guardar Cambios")
+        }
+    }
+}*/

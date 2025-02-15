@@ -1,23 +1,16 @@
+// settings.gradle.kts
 pluginManagement {
     repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
+        google() // Repositorio de Google
+        mavenCentral() // Repositorio Maven Central
     }
-}
-
-plugins {
-    id("org.gradle.toolchains.foojay-resolver-convention") version("0.5.0")
 }
 
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google()
-        mavenCentral()
+        google() // Repositorio de Google
+        mavenCentral() // Repositorio Maven Central
     }
 }
 
-rootProject.name = "Roomv1"
 include(":app")
- 

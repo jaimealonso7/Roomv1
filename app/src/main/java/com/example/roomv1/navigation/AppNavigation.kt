@@ -1,11 +1,14 @@
 package com.example.roomv1.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.roomv1.models.Facturas
 import com.example.roomv1.viewmodels.FacturasViewModel
 import com.example.roomv1.views.FacturasAddView
 import com.example.roomv1.views.FacturasListView
@@ -41,9 +44,26 @@ fun AppNavigation(viewModel: FacturasViewModel) {
         }
 
         composable(
+            "FacturasUpdateView/{id}",
+            arguments = listOf(navArgument("id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val id = backStackEntry.arguments?.getInt("id") ?: -1
+            println("ID recibido en NavHost: $id") // 🔹 Verifica el ID en NavHost
+            if (id != -1) {
+                FacturasUpdateView(navController, viewModel, id)
+            } else {
+                Text("Factura no encontrada")
+            }
+        }
+
+
+        /*composable("FacturasUpdateView") {
+            FacturasUpdateView(navController)
+        }
+        composable(
             "FacturasUpdateView/{id}/{numeroFactura}/{fechaEmision}/{empresa}/{nif}/{direccion}/{baseImponible}/{iva}/{total}",
             arguments = listOf(
-                navArgument("id") { type = NavType.IntType }, // Agregado ID
+                navArgument("id") { type = NavType.IntType },
                 navArgument("numeroFactura") { type = NavType.StringType },
                 navArgument("fechaEmision") { type = NavType.StringType },
                 navArgument("empresa") { type = NavType.StringType },
@@ -57,7 +77,7 @@ fun AppNavigation(viewModel: FacturasViewModel) {
             FacturasUpdateView(
                 navController = navController,
                 viewModel = viewModel,
-                id = backStackEntry.arguments?.getInt("id") ?: 0, // Agregado ID
+                id = backStackEntry.arguments?.getInt("id") ?: 0,
                 numeroFactura = backStackEntry.arguments?.getString("numeroFactura") ?: "",
                 fechaEmision = backStackEntry.arguments?.getString("fechaEmision") ?: "",
                 empresa = backStackEntry.arguments?.getString("empresa") ?: "",
@@ -67,7 +87,7 @@ fun AppNavigation(viewModel: FacturasViewModel) {
                 iva = backStackEntry.arguments?.getFloat("iva")?.toDouble() ?: 0.0,
                 total = backStackEntry.arguments?.getFloat("total")?.toDouble() ?: 0.0
             )
-        }
+        }*/
     }
 }
 
